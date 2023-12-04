@@ -24,7 +24,7 @@ $(function() {
 					email: "Please enter a valid email address",
 					message: "Please enter a message"
 				},
-				/* submit via ajax */
+				/* submit via ajax 
 				submitHandler: function(form) {		
 					var $submit = $('.submitting'),
 						waitText = 'Submitting...';
@@ -59,7 +59,7 @@ $(function() {
 				         $submit.css('display', 'none');
 				      }
 			      });    		
-		  		}
+		  		}*/
 				
 			} );
 		}

@@ -80,8 +80,11 @@ function gen_pay($email, $amount, $currency, $reference, $callback_url)
 
 //collect info from user from and push to paystack api 
 if (isset($_POST['buy'])) {
+
+    echo"passed";
+
     $_SESSION['name'] = $_POST['name'];
-    $amount = $_POST['amount'] * 100;
+    $amount = $AMOUNT * 100;
     $email = $_POST["email"];
     $currency = "NGN";
     $_SESSION['ref'] = gen_ref();
@@ -101,7 +104,7 @@ if (isset($_GET['ref'])) {
 
     // add ticket details to database
     $_name = mysqli_real_escape_string($DB, $_SESSION['name']);
-    $_ticket_id = mysqli_real_escape_string($DB, $ref);
+    $_ticket_id = mysqli_real_escape_string($DB, $_ref);
     $query = "INSERT INTO e_users (Name, TIcket_ID) VALUES ('$_name','$_ticket_id')";
     if (mysqli_query($DB, $query)) {
         echo "New record created successfully";
@@ -113,7 +116,7 @@ if (isset($_GET['ref'])) {
     if ($_status == "success" && $_ref == $_GET['ref']) {
         // generate qrcode for ticket url
         $ticket_url = "{$URL}/Scripts/handle.php?scan={$_SESSION['ref']}";
-        $_SESSION["qr"] = "https://api.qrserver.com/v1/create-qr-code/?data={$ticket_url}=300x300";
+        $_SESSION["qr"] = "https://api.qrserver.com/v1/create-qr-code/?data={$ticket_url}&size=300x300";
         header("location: ../display.php");
     }
 }
