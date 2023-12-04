@@ -3,7 +3,7 @@
 require "config.php";
 session_start();
 
-$DB = new mysqli($HOST, $DB_USER, $DB_PASS, $DB, $PORT);
+$DB = mysqli_connect($HOST, $DB_USER, $DB_PASS, $DB, $PORT);
 
 // check databse connection
 if (!$DB) {
@@ -14,7 +14,7 @@ if (!$DB) {
 
 // define functions
 
-
+//generate ref 
 function gen_ref()
 {
     $r_num = rand(00000, 99999);
@@ -22,6 +22,7 @@ function gen_ref()
     return $ref;
 }
 
+// verify payment
 function verify_pay($reference)
 {
     global $SECRET_KEY;
@@ -45,6 +46,7 @@ function verify_pay($reference)
     return $response;
 }
 
+// generate payment link
 function gen_pay($email, $amount, $currency, $reference, $callback_url)
 {
     global $SECRET_KEY;
@@ -90,12 +92,43 @@ if (isset($_POST['buy'])) {
     header("location: {$pay['data']['authorization_url']}");
 }
 
-//if transcation is completed call back url to check if transaction was successfull
+//if transcation is completed call back url to check if transaction was successfull and generate qr code
 if (isset($_GET['ref'])) {
+    // return from api
     $pay = json_decode(verify_pay($_GET['ref']), true);
     $_ref = $pay["data"]['reference'];
     $_status = $pay["data"]['status'];
-    if ($_status == "success" && $_ref == $_GET['ref']):{
-        pass;
+
+    // add ticket details to database
+    $_name = mysqli_real_escape_string($DB, $_SESSION['name']);
+    $_ticket_id = mysqli_real_escape_string($DB, $ref);
+    $query = "INSERT INTO e_users (Name, TIcket_ID) VALUES ('$_name','$_ticket_id')";
+    if (mysqli_query($DB, $query)) {
+        echo "New record created successfully";
+    } else {
+        echo "Error: " . $query . "<br>" . mysqli_error($DB);
+    }
+
+    // generate qr code and display
+    if ($_status == "success" && $_ref == $_GET['ref']) {
+        // generate qrcode for ticket url
+        $ticket_url = "{$URL}/Scripts/handle.php?scan={$_SESSION['ref']}";
+        $_SESSION["qr"] = "https://api.qrserver.com/v1/create-qr-code/?data={$ticket_url}=300x300";
+        header("location: ../display.php");
+    }
+}
+
+//scan ticket
+if(isset($_GET['scan'])){
+    $ref=$_GET['scan'];
+    //search for info and return details
+    $query="SELECT * FROM e_users WHERE TIcket_ID = '$ref'";
+    $result=mysqli_query($DB,$query);
+    if(mysqli_num_rows($result)>0){
+        $_SESSION['scan_info']=mysqli_fetch_assoc($result);
+        header("location: verify.php?found=yes");
+    }
+    else{
+        header("location: verify.php?found=no");
     }
 }
