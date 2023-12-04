@@ -115,9 +115,9 @@ if (isset($_GET['ref'])) {
     // generate qr code and display
     if ($_status == "success" && $_ref == $_GET['ref']) {
         // generate qrcode for ticket url
-        $ticket_url = "{$URL}/Scripts/handle.php?scan={$_SESSION['ref']}";
+        $ticket_url = "{$URL}/Scripts/handle.php?scan={$_GET['ref']}";
         $_SESSION["qr"] = "https://api.qrserver.com/v1/create-qr-code/?data={$ticket_url}&size=300x300";
-        header("location: ../display.php");
+        header("location: ../display.php?ref={$_GET['ref']}");
     }
 }
 
@@ -129,9 +129,9 @@ if(isset($_GET['scan'])){
     $result=mysqli_query($DB,$query);
     if(mysqli_num_rows($result)>0){
         $_SESSION['scan_info']=mysqli_fetch_assoc($result);
-        header("location: verify.php?found=yes");
+        header("location: ../verify.php?found=yes");
     }
     else{
-        header("location: verify.php?found=no");
+        header("location: ../verify.php?found=no");
     }
 }

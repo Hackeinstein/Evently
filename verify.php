@@ -1,5 +1,6 @@
 <?php
 session_start();
+$status=$_GET['found'];
 ?>
 <html lang="en"><head>
     <!-- Required meta tags -->
@@ -32,10 +33,28 @@ session_start();
           <div class="row justify-content-center">
             <div class="col-md-6" >
             <center>
-              <h3 class="heading mb-4">Euphoria Hangout!</h3>
-              <p>Scan the Qr code to access venue </p>
+              <h3 class="heading mb-4"><?php 
+              if ($status == "yes"){
+                echo "Welcome to Euphoria";
+              }else{
+                echo "Ticket not found !";
+              }
+              ?></h3>
+              <p><?php 
+              if ($status == "yes"){
+                echo "Take a Step In";
+              }else{
+                echo "Take a Step Out!";
+              }
+              ?></p>
               
-              <p><img src="<?php echo $_SESSION['qr'];?>" alt="Image" class="img-fluid center"></p>
+              <p><img src="<?php 
+              if ($status == "yes"){
+                echo "https://media.giphy.com/media/l0MYGb1LuZ3n7dRnO/giphy.gif";
+              }else{
+                echo "https://media.giphy.com/media/1zgOyLCRxCmV5G3GFZ/giphy.gif";
+              }
+              ?>" alt="Image" class="img-fluid center"></p>
               </center>
 
             </div>
@@ -44,7 +63,13 @@ session_start();
               <form class="mb-5" method="post" id="contactForm">
                 <div class="row">
                   <div class="col-md-12 form-group">
-                    <input type="text" class="form-control"  placeholder="<?php echo $_SESSION['name'];?>" disabled="disabled">
+                    <input type="text" class="form-control"  placeholder="<?php 
+              if ($status == "yes"){
+                echo $_SESSION['scan_info']['Name'];
+              }else{
+                echo "Intruder!";
+              }
+              ?>" disabled="disabled">
                   </div>
                 </div>
                 <div class="row">
